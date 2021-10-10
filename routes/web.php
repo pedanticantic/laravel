@@ -16,4 +16,6 @@ use App\Http\Controllers\ProductsController;
 
 Route::get('/', function () {
     return view('welcome');
-})
+});
+
+// @TODO: Need routes for the new endpoints here.
