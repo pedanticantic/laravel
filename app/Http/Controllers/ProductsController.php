@@ -22,11 +22,11 @@ class ProductsController extends Controller
     {
         // @TODO: If a section name is supplied, validate it.
 
-        // @TODO: Build the query. Do this in a service method.
-        $storeID = 3;
-        $query = StoreProduct::where('store_id', $storeID)->where('deleted', '0')->where('available', '1');
+        // @TODO: Build the query. Do all this in a service method.
+        $query = StoreProduct::where('store_id', $this->storeId)->where('deleted', '0')->where('available', '1');
 
-        // @TODO: If a section name is supplied, add an appropriate filter to the query.
+        // @TODO: specify the sort order, depending on whether a section name was supplied or not.
+        // If a section name is supplied, add an appropriate filter to the query.
         if (!is_null($sectionName)) {
             $query = $query->whereHas('sections', function (Builder $query) use ($sectionName) {
                 $query->where('description', $sectionName);
@@ -40,6 +40,7 @@ class ProductsController extends Controller
 //        echo '$rows count: '.count($rows);
 
         // @TODO: Output the results. We need the number of pages and then the results.
+        // @TODO: Add appropriate presenters.
         return json_encode($rows);
     }
 }
