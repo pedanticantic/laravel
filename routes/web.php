@@ -1,5 +1,6 @@
 <?php
 
+use App\store_products;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductsController;
 
@@ -17,5 +18,8 @@ use App\Http\Controllers\ProductsController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route for legacy code.
+Route::get('/legacy/{storeID}/{section}/{number?}/{page?}/{sort?}', sprintf('%s@sectionProducts', store_products::class));
 
 // @TODO: Need routes for the new endpoints here.
