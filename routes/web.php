@@ -22,4 +22,7 @@ Route::get('/', function () {
 // Route for legacy code.
 Route::get('/legacy/{storeID}/{section}/{number?}/{page?}/{sort?}', sprintf('%s@sectionProducts', store_products::class));
 
-// @TODO: Need routes for the new endpoints here.
+// The new endpoints.
+// '/products/' returns products from all sections.
+// '/products/<sectionname>' returns products from the given section
+Route::get('/products/{sectionname?}', sprintf('%s@show', ProductsController::class));
