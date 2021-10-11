@@ -48,7 +48,8 @@ class ProductsController extends Controller
             }
         }
 
-        // @TODO: Build the query. Do all this in a service method.
+        // Build the query.
+        // @TODO: This should be done in a service class/method.
         $query = StoreProduct::where('store_id', $this->storeId)->where('deleted', '0')->where('available', '1')
             ->with('artist');
 
