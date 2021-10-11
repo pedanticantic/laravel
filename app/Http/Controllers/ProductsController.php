@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Section;
 use App\Models\StoreProduct;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -37,7 +38,13 @@ class ProductsController extends Controller
      */
     public function show(Request $request, string $sectionName = null)
     {
-        // @TODO: If a section name is supplied, validate it.
+        // If a section name is supplied, validate it.
+        if (!is_null($sectionName)) {
+            $found = Section::where('description', $sectionName)->count() > 0;
+            if (!$found) {
+                return response(sprintf('Sorry, that section ("%s") does not exist', $sectionName), 404);
+            }
+        }
 
         // @TODO: Build the query. Do all this in a service method.
         $query = StoreProduct::where('store_id', $this->storeId)->where('deleted', '0')->where('available', '1')
