@@ -29,7 +29,13 @@ class ProductsController extends Controller
         $this->imagesDomain = "https://img.tmstor.es/";
     }
 
-    public function show(string $sectionName = null)
+    /**
+     * @param Request $request
+     * @param string|null $sectionName
+     *
+     * @return false|string
+     */
+    public function show(Request $request, string $sectionName = null)
     {
         // @TODO: If a section name is supplied, validate it.
 
@@ -48,14 +54,19 @@ class ProductsController extends Controller
         // @TODO: Add code to exclude products based on $launch_date, $remove_date, disabled countries, etc.
 
         // Determine the total number of rows that match the criteria, and therefore how many pages of rows there are.
-        $rows = $query->get();
+        $rowCount = $query->count();
 
-        // @TODO: Add any pagination in here. Be careful of it breaking the subsequent code.
-        $page = 1;
-        $number = 8;
+        // Add any pagination in here. This must be done after we get the "full" row count.
+        // @TODO: Ideally we should validate that these parameters (number and page) are integers and greater than zero.
+        $number = $request->has('number') ? (int) $request->get('number') : 8;
+        $number = max(1, $number); // Don't allow negative or zero page lengths.
+        $page = $request->has('page') ? (int) $request->get('page') : 1;
+        $page = max(1, $page); // Don't allow negative or zero page numbers.
 
-        // @TODO: get the actual results of the query. IE put the LIMIT/OFFSET stuff in.
-        $pages = ceil(count($rows)/$number);
+        $query->skip(($page-1)*$number)->take($number); // Tell the query to splice the rows at the right place.
+
+        // Get the actual results of the query, and build the output from this endpoint.
+        $pages = ceil($rowCount/$number);
         $result = array_merge(
             ['pages' => $pages],
             $this->presentProducts($query->get())
