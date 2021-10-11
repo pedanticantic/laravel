@@ -91,7 +91,19 @@ class ProductsController extends Controller
                 break;
         }
 
-        // @TODO: Add code to exclude products based on $launch_date, $remove_date, disabled countries, etc.
+        // Add code to exclude products based on $launch_date, $remove_date, disabled countries, etc.
+        // If we're not in preview mode, exclude products that are launching in the future.
+        if (!isset($_SESSION['preview_mode'])) {
+            // We need to be careful to make sure the "OR" doesn't interfere with anything else.
+            // This is a bit yucky because '0000-00-00 00:00:00' is not a valid date/time and MySQL complains if you try and
+            // compare a date/time value to it; you have to convert the date/time to a string and compare them as strings.
+            $query->whereRaw('(CAST(launch_date AS char) = "0000-00-00 00:00:00" OR launch_date <= CURRENT_TIMESTAMP)');
+        }
+        // Similar with "remove date", but we always do it. Again, comparing to that invalid date is yucky.
+        $query->whereRaw('(CAST(remove_date AS char) = "0000-00-00 00:00:00" OR remove_date > CURRENT_TIMESTAMP)');
+        // Handle any disabled countries.
+        $country_code = 'GB'; // Hard-coded for now.
+        $query->whereRaw('(disabled_countries = "" OR FIND_IN_SET("'.$country_code.'", disabled_countries) = 0)');
 
         // Determine the total number of rows that match the criteria, and therefore how many pages of rows there are.
         $rowCount = $query->count();
