@@ -6,7 +6,9 @@ use App\Models\Section;
 use App\Models\StoreProduct;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ProductsController extends Controller
 {
@@ -34,7 +36,7 @@ class ProductsController extends Controller
      * @param Request $request
      * @param string|null $sectionName
      *
-     * @return false|string
+     * @return JsonResponse|Response
      */
     public function show(Request $request, string $sectionName = null)
     {
@@ -110,9 +112,8 @@ class ProductsController extends Controller
             $this->presentProducts($query->get())
         );
 
-        // Output the results.
-        // @TODO: Use the JSON converter built in to the Response object.
-        return json_encode($result);
+        // Output the results. Use the JSON converter built in to the Response object.
+        return response()->json($result);
     }
 
     /**
@@ -129,7 +130,7 @@ class ProductsController extends Controller
         foreach($storeProducts as $storeProduct) {
             $image = $this->imagesDomain;
             if (strlen($storeProduct->image_format) > 2) {
-                $image .= sprintf('/%d.%s', $storeProduct->main_id, $storeProduct->image_format);
+                $image .= sprintf('/%d.%s', $storeProduct->id, $storeProduct->image_format);
             } else {
                 $image .= 'noimage.jpg';
             }
