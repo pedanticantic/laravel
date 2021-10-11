@@ -50,12 +50,43 @@ class ProductsController extends Controller
         $query = StoreProduct::where('store_id', $this->storeId)->where('deleted', '0')->where('available', '1')
             ->with('artist');
 
-        // @TODO: specify the sort order, depending on whether a section name was supplied or not.
         // If a section name is supplied, add an appropriate filter to the query.
         if (!is_null($sectionName)) {
             $query = $query->whereHas('sections', function (Builder $query) use ($sectionName) {
                 $query->where('description', $sectionName);
             });
+        }
+
+        // Specify the sort order, depending on whether a sort order and/or a section name was supplied or not.
+        $sort = $request->get('sort', 'position');
+        switch ($sort) {
+            case 'az':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'za':
+                $query->orderBy('name' ,'desc');
+                break;
+            case 'low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'old':
+                $query->orderBy('release_date', 'asc');
+                break;
+            case 'new':
+                $query->orderBy('release_date', 'desc');
+                break;
+            case 'position':
+            default:
+                if (is_null($sectionName)) {
+                    $query->orderBy('position', 'asc')->orderBy('release_date', 'desc');
+                } else {
+                    // @TODO: Get the sorting on section position working. Might have to refactor the filter on section name.
+                    $query->/*orderBy('store_products_section.position', 'asc')->*/orderBy('release_date', 'desc');
+                }
+                break;
         }
 
         // @TODO: Add code to exclude products based on $launch_date, $remove_date, disabled countries, etc.
